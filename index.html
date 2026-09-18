@@ -1606,8 +1606,9 @@ function downloadPDF() {
     margin:       [10, 10, 10, 10],
     filename:     fileName,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 800 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    /* ДОДАЙТЕ ЦЕЙ ПАРАМЕТР AVOID, ЩОБ БЛОКИ НЕ РІЗАЛИСЬ ПОСЕРЕДИНІ: */
     pagebreak:    { 
       mode: ['css', 'legacy'], 
       avoid: ['.review-item', '.level-feedback-box', '.results-header', '.stat-box'] 
