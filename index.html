@@ -1605,13 +1605,10 @@ function downloadPDF() {
   const opt = {
     margin:       [10, 10, 10, 10],
     filename:     fileName,
-    image:        { type: 'jpeg', quality: 0.95 },
+    image:        { type: 'jpeg', quality: 0.92 },
     html2canvas:  { scale: 1.5, useCORS: true, logging: false, windowWidth: 800 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { 
-      mode: ['css', 'legacy'], 
-      avoid: ['.review-item', '.results-header', '.score-circle', '.level-feedback-box', '.stat-box'] 
-    }
+    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Знімаємо конфлікти селекторів
   };
 
   html2pdf().set(opt).from(element).save().then(() => {
