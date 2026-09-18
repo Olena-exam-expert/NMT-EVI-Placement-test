@@ -676,7 +676,7 @@
       <!-- Попереджувальний блок про відволікання -->
       <div class="integrity-warning-box">
         <h3>⚠️ Працюйте без відволікань!</h3>
-        <p>Намагайтеся не залишати цю сторінку під час виконання — усі переходи між вкладками та вікнами автоматично трекаються і будуть внесені до фінального звіту для викладача. Не забудьте зберегти аналіз результатів у форматі PDF.</p>
+        <p>Намагайтеся не залишати цю сторінку під час виконання — усі переходи між вкладками та вікнами автоматично трекаються і будуть внесені до фінального звіту для викладача.</p>
         <label class="checkbox-label">
           <input type="checkbox" id="agreeRulesCheckbox" onchange="toggleStartButton()">
           Я ознайомлений(-а) та готовий(-а) виконувати тест чесно
@@ -1603,14 +1603,14 @@ function downloadPDF() {
   const fileName = `Аналіз_тесту_${formattedName}.pdf`;
 
   const opt = {
-    margin:       [8, 8, 8, 8],
+    margin:       [10, 10, 10, 10],
     filename:     fileName,
-    image:        { type: 'jpeg', quality: 0.95 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 800 },
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak:    { 
       mode: ['css', 'legacy'], 
-      avoid: ['.review-item', '.results-header', '.score-circle', '.level-feedback-box', '.stat-box'] 
+      avoid: ['.review-item', '.level-feedback-box', '.results-header', '.stat-box'] 
     }
   };
 
