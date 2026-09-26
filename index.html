@@ -1,1624 +1,1428 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diagnostic Test for НМТ/ЄВІ prep</title>
-
-  <!-- Бібліотека для конвертації HTML у PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <style>
-    :root {
-      --primary-color: #1e3a8a;
-      --primary-hover: #1d4ed8;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --radius: 12px;
-      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding: 20px 12px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 800px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .header-bar {
-      background-color: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-      position: sticky;
-      top: 10px;
-      z-index: 100;
-    }
-
-    .test-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    .timer-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--primary-color);
-      background-color: #eff6ff;
-      padding: 8px 16px;
-      border-radius: 20px;
-    }
-
-    .timer-badge.warning {
-      color: var(--danger);
-      background-color: var(--danger-bg);
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    .screen {
-      background-color: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 28px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .welcome-card h1 {
-      color: var(--primary-color);
-      margin-bottom: 12px;
-      font-size: 1.75rem;
-    }
-
-    .welcome-card p {
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    /* Блок попередження */
-    .integrity-warning-box {
-      background-color: var(--danger-bg);
-      border: 2px solid #fca5a5;
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 24px;
-    }
-
-    .integrity-warning-box h3 {
-      color: var(--danger);
-      font-size: 1.05rem;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .integrity-warning-box p {
-      color: #991b1b;
-      font-size: 0.95rem;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #7f1d1d;
-      cursor: pointer;
-    }
-
-    .checkbox-label input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-main);
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 8px;
-      border: 2px solid var(--border-color);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    .input-group input:focus {
-      border-color: var(--primary-color);
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .info-item {
-      background: #f1f5f9;
-      padding: 16px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .info-item .num {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    .info-item .label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .quiz-progress-bar-wrap {
-      width: 100%;
-      height: 8px;
-      background-color: var(--border-color);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .quiz-progress-bar {
-      height: 100%;
-      width: 0%;
-      background-color: var(--primary-color);
-      transition: width 0.3s ease;
-    }
-
-    .nav-map {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-color);
-      max-height: 120px;
-      overflow-y: auto;
-    }
-
-    .nav-cell {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      background-color: #f8fafc;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .nav-cell:hover {
-      border-color: var(--primary-color);
-      color: var(--primary-color);
-    }
-
-    .nav-cell.active {
-      outline: 2px solid var(--primary-color);
-      outline-offset: 1px;
-      font-weight: 800;
-    }
-
-    .nav-cell.answered {
-      background-color: #dbeafe;
-      border-color: #93c5fd;
-      color: var(--primary-color);
-    }
-
-    .nav-cell.skipped {
-      background-color: #fef3c7;
-      border-color: #fde047;
-      color: var(--warning);
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .section-badge {
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      padding: 4px 10px;
-      border-radius: 4px;
-      background-color: #e0e7ff;
-      color: var(--primary-color);
-    }
-
-    .q-counter {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .question-text {
-      font-size: 1.2rem;
-      font-weight: 600;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-
-    /* Стилі для зображень у запитаннях */
-    .question-image-container {
-      width: 100%;
-      text-align: center;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .question-image {
-      max-width: 100%;
-      max-height: 320px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      object-fit: contain;
-    }
-
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .option-btn {
-      width: 100%;
-      text-align: left;
-      padding: 14px 18px;
-      border-radius: 8px;
-      border: 2px solid var(--border-color);
-      background-color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .option-btn:hover:not(:disabled) {
-      border-color: var(--primary-color);
-      background-color: #f0f7ff;
-    }
-
-    .option-btn .opt-letter {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background-color: #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    .option-btn.selected {
-      border-color: var(--primary-color);
-      background-color: #eff6ff;
-    }
-
-    .actions-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn {
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: none;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .btn-primary:disabled {
-      background-color: #cbd5e1;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background-color: #f1f5f9;
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background-color: #e2e8f0;
-      color: var(--text-main);
-    }
-
-    .btn-warning {
-      background-color: #fffbeb;
-      color: var(--warning);
-      border: 1px solid #fde047;
-    }
-
-    .btn-warning:hover {
-      background-color: #fef3c7;
-    }
-
-    .btn-finish {
-      background-color: var(--success);
-      color: #fff;
-    }
-
-    .btn-finish:hover {
-      background-color: #15803d;
-    }
-
-    .btn-pdf {
-      background-color: #1e3a8a;
-      color: #fff;
-    }
-
-    .btn-pdf:hover {
-      background-color: #1d4ed8;
-    }
-
-    .results-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .score-circle {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      background: conic-gradient(var(--primary-color) 0%, #e2e8f0 0%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px auto;
-      position: relative;
-    }
-
-    .score-circle-inner {
-      width: 105px;
-      height: 105px;
-      background: #fff;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .score-circle-inner .percentage {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary-color);
-    }
-
-    .score-stats {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .stat-box {
-      text-align: center;
-      padding: 12px 16px;
-      border-radius: 8px;
-      background: #f8fafc;
-      border: 1px solid var(--border-color);
-      min-width: 110px;
-    }
-
-    .stat-box .val {
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .stat-box.correct .val { color: var(--success); }
-    .stat-box.incorrect .val { color: var(--danger); }
-    .stat-box.switches .val { color: var(--warning); }
-    .stat-box.switches.has-violations .val { color: var(--danger); }
-
-    .level-feedback-box {
-      background-color: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 32px;
-      text-align: center;
-    }
-
-    .level-feedback-box .level-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--primary-color);
-      margin-bottom: 8px;
-    }
-
-    .level-feedback-box .level-desc {
-      font-size: 1rem;
-      line-height: 1.5;
-      color: var(--text-main);
-    }
-
-    .action-buttons-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .review-section h2 {
-      font-size: 1.3rem;
-      margin-bottom: 16px;
-      color: var(--primary-color);
-    }
-
-    .review-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .review-item {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px;
-      background: #fff;
-    }
-
-    .review-item.is-correct {
-      border-left: 4px solid var(--success);
-    }
-
-    .review-item.is-incorrect {
-      border-left: 4px solid var(--danger);
-    }
-
-    .review-item .q-title {
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 1rem;
-    }
-
-    .review-item .review-img {
-      max-width: 100%;
-      max-height: 200px;
-      margin: 8px 0 12px 0;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-    }
-
-    .review-item .ans-info {
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-    }
-
-    .review-item .exp-info {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      background-color: #f8fafc;
-      padding: 8px 12px;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
-
-    .exp-tags {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    .tag-level { background-color: #fef3c7; color: #92400e; }
-    .tag-topic { background-color: #e0f2fe; color: #075985; }
-
-    .ans-correct { color: var(--success); font-weight: 700; }
-    .ans-wrong { color: var(--danger); font-weight: 700; }
-
-    /* CSS адаптація для PDF-експорту */
-    .pdf-export-mode {
-      background: #ffffff !important;
-      padding: 0px !important;
-      color: #000 !important;
-    }
-    .pdf-export-mode .action-buttons-group {
-      display: none !important;
-    }
-    .pdf-export-mode .review-list,
-    .pdf-export-mode .score-stats {
-      display: block !important;
-    }
-    .pdf-export-mode .stat-box {
-      display: inline-block !important;
-      width: 22% !important;
-      margin: 0 1% !important;
-      vertical-align: top !important;
-    }
-    .pdf-export-mode .review-item {
-      display: block !important;
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-      -webkit-column-break-inside: avoid !important;
-      margin-bottom: 10px !important;
-      padding: 10px !important;
-    }
-    .pdf-export-mode .results-header,
-    .pdf-export-mode .score-circle,
-    .pdf-export-mode .level-feedback-box {
-      display: block !important;
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-      margin-bottom: 12px !important;
-    }
-
-    @media (max-width: 600px) {
-      .screen { padding: 16px; }
-      .header-bar { padding: 12px 16px; }
-      .test-title { font-size: 0.95rem; }
-      .question-text { font-size: 1.05rem; }
-      .score-stats { gap: 8px; }
-      .stat-box { padding: 8px 10px; min-width: 45%; }
-      .actions-row { flex-wrap: wrap; }
-      .btn { flex: 1 1 45%; font-size: 0.85rem; padding: 10px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пробний НМТ з англійської мови</title>
+    <!-- html2pdf Library CDN for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #1c3d8d;
+            --primary-hover: #152e6d;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --skipped: #d97706;
+            --skipped-bg: #fffbe3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Modal Overlay for Student Name */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-card h2 {
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .modal-card p.modal-desc {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .modal-warning {
+            background-color: #fffbe3;
+            border: 1px solid #fde047;
+            border-left: 5px solid #d97706;
+            border-radius: 8px;
+            padding: 14px 16px;
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .modal-warning strong {
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: #92400e;
+        }
+
+        .modal-card input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .modal-card input:focus {
+            border-color: var(--primary);
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            border: 1px solid var(--border);
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            color: var(--text);
+        }
+
+        .student-display {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .timer-badge {
+            color: var(--error);
+            border-color: #fca5a5;
+            background: var(--error-bg);
+        }
+
+        .warning-badge {
+            color: #c2410c;
+            border-color: #ffedd5;
+            background: #fff7ed;
+        }
+
+        .score-summary-card {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .score-summary-card.active {
+            display: block;
+        }
+
+        .score-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        .score-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 16px 24px;
+            border-radius: 10px;
+            min-width: 180px;
+        }
+
+        .score-box-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-box-lbl {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .nav-matrix-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .matrix-btn {
+            height: 36px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .matrix-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .matrix-btn.answered {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .matrix-btn.skipped {
+            background: var(--skipped-bg);
+            color: var(--skipped);
+            border-color: var(--skipped);
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .task-card.active {
+            display: block;
+        }
+
+        .task-header {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .task-instruction {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+        }
+
+        .reading-text {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 24px;
+            font-size: 0.98rem;
+            line-height: 1.7;
+        }
+
+        .reading-text p {
+            margin-bottom: 12px;
+        }
+
+        .reading-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .options-list-box {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .options-list-box div {
+            margin-bottom: 4px;
+        }
+
+        .question-block {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+
+        .question-excerpt {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .question-img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 10px 0 16px 0;
+            display: block;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .option-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 0.92rem;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: #f0f3fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .option-btn.correct {
+            background: var(--success-bg) !important;
+            border-color: var(--success) !important;
+            color: var(--success) !important;
+            font-weight: 700;
+        }
+
+        .option-btn.incorrect {
+            background: var(--error-bg) !important;
+            border-color: var(--error) !important;
+            color: var(--error) !important;
+        }
+
+        .skip-btn {
+            background: none;
+            border: none;
+            color: var(--skipped);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .skip-btn:hover {
+            text-decoration: underline;
+        }
+
+        .explanation-box {
+            display: none;
+            background: #fffbe3;
+            border: 1px solid #fef08a;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .explanation-box.visible {
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .action-btn.secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--bg);
+        }
+
+        .action-btn.submit-btn {
+            background: var(--success);
+        }
+
+        .action-btn.submit-btn:hover {
+            background: #15803d;
+        }
+
+        .action-btn.pdf-btn {
+            background: var(--primary);
+            padding: 14px 28px;
+            font-size: 1rem;
+            margin-top: 12px;
+        }
+
+        .action-btn.pdf-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        #pdfReport {
+            display: none;
+            background: #ffffff;
+            color: #0f172a;
+            padding: 24px;
+            font-size: 12px;
+        }
+
+        .pdf-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-header h1 {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .pdf-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 13px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pdf-q-item {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            page-break-inside: avoid;
+        }
+
+        .pdf-q-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .pdf-ans {
+            margin: 2px 0;
+        }
+
+        .pdf-exp {
+            background: #fef08a;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-size: 11px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="app-container">
-  
-  <div class="header-bar">
-    <div class="test-title">Diagnostic Test for НМТ/ЄВІ prep</div>
-    <div class="timer-badge" id="timerBadge">
-      ⏱️ <span id="timerDisplay">45:00</span>
+<!-- Student Name Input Modal -->
+<div class="modal-overlay" id="nameModal">
+    <div class="modal-card">
+        <h2>Вітаємо на тестуванні!</h2>
+        <p class="modal-desc">Будь ласка, введіть ваше ім'я та прізвище для початку пробного НМТ.</p>
+
+        <div class="modal-warning">
+            <strong>⚠️ Увага! Важливі правила проходження тесту:</strong>
+            • На виконання тесту відведено 60 хвилин.<br>
+            • У системі працює трекер відволікань. Перемикання вкладок, згортання браузера або перехід в інші вікна буде зафіксовано в підсумковому результаті.<br>
+            • Ви можете пропускати питання та повертатися до них у будь-який момент за допомогою навігаційної панелі.
+        </div>
+
+        <input type="text" id="studentNameInput" placeholder="Введіть ПІБ учня..." required autofocus />
+        <button class="action-btn" style="width: 100%;" onclick="startAssessment()">Розпочати тест</button>
     </div>
-  </div>
-
-  <!-- Start Screen -->
-  <div class="screen active" id="startScreen">
-    <div class="welcome-card">
-      <h1>Diagnostic Test for НМТ/ЄВІ prep</h1>
-      <p>Цей тест містить 50 питань для діагностики лексичної та граматичної компетенції (рівні A2–B2+).</p>
-      
-      <!-- Попереджувальний блок про відволікання -->
-      <div class="integrity-warning-box">
-        <h3>⚠️ Працюйте без відволікань!</h3>
-        <p>Намагайтеся не залишати цю сторінку під час виконання — усі переходи між вкладками та вікнами автоматично трекаються і будуть внесені до фінального звіту для викладача.</p>
-        <label class="checkbox-label">
-          <input type="checkbox" id="agreeRulesCheckbox" onchange="toggleStartButton()">
-          Я ознайомлений(-а) та готовий(-а) виконувати тест чесно
-        </label>
-      </div>
-
-      <div class="input-group">
-        <label for="studentNameInput">Введіть ваші Прізвище та Ім'я:</label>
-        <input type="text" id="studentNameInput" placeholder="наприклад, Мельник Марія" autocomplete="off">
-      </div>
-
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="num">50</div>
-          <div class="label">Завдань</div>
-        </div>
-        <div class="info-item">
-          <div class="num">45 хв</div>
-          <div class="label">Таймер</div>
-        </div>
-        <div class="info-item">
-          <div class="num">A2–B2+</div>
-          <div class="label">Рівень складності</div>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" id="startQuizBtn" style="width: 100%; height: 48px;" onclick="startQuiz()" disabled>Розпочати тест</button>
-    </div>
-  </div>
-
-  <!-- Quiz Screen -->
-  <div class="screen" id="quizScreen">
-    <div class="quiz-progress-bar-wrap">
-      <div class="quiz-progress-bar" id="progressBar"></div>
-    </div>
-
-    <div class="nav-map" id="navMap"></div>
-
-    <div class="meta-row">
-      <span class="section-badge" id="sectionBadge">Lexical Competence</span>
-      <span class="q-counter" id="qCounter">Питання 1 з 50</span>
-    </div>
-
-    <div class="question-text" id="questionText">Loading...</div>
-
-    <!-- Контейнер для зображення -->
-    <div class="question-image-container" id="questionImageWrap">
-      <img src="" alt="Question Illustration" class="question-image" id="questionImage">
-    </div>
-
-    <div class="options-grid" id="optionsGrid"></div>
-
-    <div class="actions-row">
-      <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>← Назад</button>
-      <button class="btn btn-warning" id="skipBtn" onclick="skipQuestion()">Пропустити ↷</button>
-      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Далі →</button>
-      <button class="btn btn-finish" id="finishBtn" onclick="finishQuiz()" style="display: none;">Завершити 🏁</button>
-    </div>
-  </div>
-
-  <!-- Results Screen -->
-  <div class="screen" id="resultsScreen">
-    <div id="pdfPrintArea">
-      <div class="results-header">
-        <h2>Тест завершено!</h2>
-        <p style="color: var(--text-muted); margin-top: 4px;" id="resultsSubtext">Результат вашої діагностики:</p>
-      </div>
-
-      <div class="score-circle" id="scoreCircle">
-        <div class="score-circle-inner">
-          <span class="percentage" id="scorePercent">0%</span>
-        </div>
-      </div>
-
-      <div class="score-stats">
-        <div class="stat-box correct">
-          <div class="val" id="correctCount">0</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Вірно</div>
-        </div>
-        <div class="stat-box incorrect">
-          <div class="val" id="incorrectCount">0</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Помилки / Пропущені</div>
-        </div>
-        <div class="stat-box">
-          <div class="val" id="timeSpent">00:00</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Час</div>
-        </div>
-        <!-- Фіксація виходів у результатах -->
-        <div class="stat-box switches" id="switchesStatBox">
-          <div class="val" id="tabSwitchesCount">0</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Переходи/Виходи</div>
-        </div>
-      </div>
-
-      <div class="level-feedback-box" id="levelFeedbackBox">
-        <div class="level-title" id="feedbackLevelTitle">Рівень</div>
-        <div class="level-desc" id="feedbackLevelDesc">Опис...</div>
-      </div>
-
-      <div class="action-buttons-group">
-        <button class="btn btn-pdf" style="width: 100%; height: 48px;" onclick="downloadPDF()">
-          📄 Завантажити розбір у PDF
-        </button>
-      </div>
-
-      <div class="review-section">
-        <h2>Детальний аналіз відповідей</h2>
-        <div class="review-list" id="reviewList"></div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<script>
-const quizData = [
-  // SECTION 1: LEXICAL COMPETENCE (1-25)
-  {
-    q: "When you cross the street, you must always _____ attention to the traffic lights.",
-    img: null,
-    opts: ["pay", "give", "take", "make"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Collocations",
-    exp: "pay attention to — стійке словосполучення «звертати увагу»."
-  },
-  {
-    q: "Before your trip to London, you should _____ good use of your offline map app.",
-    img: null,
-    opts: ["do", "create", "gain", "make"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Collocations",
-    exp: "make good use of — стійкий вираз «ефективно використати»."
-  },
-  {
-    q: "Volunteering at a local animal shelter is a great way for teenagers to _____ practical experience.",
-    img: null,
-    opts: ["earn", "gain", "raise", "collect"],
-    ans: 1,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Collocations",
-    exp: "gain experience — колокація «здобувати досвід»."
-  },
-  {
-    q: "Bad weather over the weekend _____ major delays for all outdoor sports games.",
-    img: null,
-    opts: ["made", "reasoned", "caused", "did"],
-    ans: 2,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Collocations",
-    exp: "cause delays — призводити до затримок / викликати затримки."
-  },
-  {
-    q: "After two hours of debate, the student council finally _____ a consensus on the graduation party theme.",
-    img: null,
-    opts: ["gained", "achieved", "accomplished", "reached"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2",
-    topic: "Academic Collocations",
-    exp: "reach a consensus — дійти згоди (академічна колокація)."
-  },
-  {
-    q: "The new policy regarding mobile devices in the library will come into _____ next Monday.",
-    img: null,
-    opts: ["power", "impact", "force", "action"],
-    ans: 2,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2+",
-    topic: "Idiomatic Phrases",
-    exp: "come into force — набрати чинності (про правила/закони)."
-  },
-  {
-    q: "I need to buy a new _____ of white sneakers before our gym class tomorrow.",
-    img: null,
-    opts: ["couple", "double", "pair", "item"],
-    ans: 2,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Confusing Nouns",
-    exp: "a pair of sneakers — пара кросівок (вживається з парними предметами)."
-  },
-  {
-    q: "My teacher gave me some helpful _____ on how to organize my daily schedule.",
-    img: null,
-    opts: ["advice", "advise", "advising", "advices"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Uncountable Nouns",
-    exp: "advice — незлічувальний іменник, не має форми множини та артикля a."
-  },
-  {
-    q: "The unexpected cold weather severely _____ the fruit trees in our garden this spring.",
-    img: null,
-    opts: ["protected", "effected", "infected", "affected"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1+",
-    topic: "Affect vs Effect",
-    exp: "affect (дієслово) — негативно впливати на щось."
-  },
-  {
-    q: "Can you please _____ me where the bus stop is? I am new in this town.",
-    img: null,
-    opts: ["speak", "say", "talk", "tell"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Say vs Tell vs Speak",
-    exp: "tell somebody — вимагає прямого додатка (tell me)."
-  },
-  {
-    q: "Scientists take a completely different _____ to studying deep-sea creatures than land animals.",
-    img: null,
-    opts: ["attitude", "entrance", "access", "approach"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2",
-    topic: "Nouns in Context",
-    exp: "approach to — підхід до розв'язання проблеми / вивчення."
-  },
-  {
-    q: "Remember to _____ off the TV before you go to bed.",
-    img: null,
-    opts: ["turn", "put", "take", "call"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Basic Phrasal Verbs",
-    exp: "turn off — вимикати прилад."
-  },
-  {
-    q: "The school had to _____ off the picnic because of heavy morning rain.",
-    img: null,
-    opts: ["put", "taken", "called", "turned"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Intermediate Phrasal Verbs",
-    exp: "put off — перенести подію на пізніше, також могло б бути call off (скасувати), якби це дієслово було в інфінітиві."
-  },
-  {
-    q: "If you don't know this English word, you can _____ it up in a dictionary.",
-    img: null,
-    opts: ["find", "look", "search", "check"],
-    ans: 1,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Intermediate Phrasal Verbs",
-    exp: "look up — шукати інформацію/слово у словнику чи довіднику."
-  },
-  {
-    q: "The confusing news reports only _____ to the panic among local residents.",
-    img: null,
-    opts: ["increased", "expanded", "raised", "added"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2",
-    topic: "Phrasal Verbs & Prepositions",
-    exp: "add to — додавати до / посилювати (додавати плутанини)."
-  },
-  {
-    q: "Many young athletes _____ up to Olympic champions as their role models.",
-    img: null,
-    opts: ["look", "see", "watch", "keep"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2",
-    topic: "Multi-word Phrasal Verbs",
-    exp: "look up to — рівнятися на когось, поважати авторитет."
-  },
-  {
-    q: "My best friend is really good _____ drawing cartoon characters.",
-    img: null,
-    opts: ["in", "on", "at", "for"],
-    ans: 2,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Adjectives with Prepositions",
-    exp: "good at — бути вправним у чомусь (+ V-ing)."
-  },
-  {
-    q: "Italy is famous all over the world _____ its delicious food and ancient history.",
-    img: null,
-    opts: ["with", "for", "about", "of"],
-    ans: 1,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Adjectives with Prepositions",
-    exp: "famous for — знаменитий чимось."
-  },
-  {
-    q: "Students should be fully aware _____ the rules before taking the final test.",
-    img: null,
-    opts: ["of", "about", "with", "for"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1+",
-    topic: "Dependent Prepositions",
-    exp: "aware of — усвідомлювати / знати про щось."
-  },
-  {
-    q: "Luckily, we arrived at the train station just _____ time to catch our train.",
-    img: null,
-    opts: ["on", "at", "by", "in"],
-    ans: 3,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Prepositional Phrases",
-    exp: "in time — вчасно (до настання потрібного моменту), на відміну від on time (за розкладом)."
-  },
-  {
-    q: "_____ my opinion, summer holidays should be longer!",
-    img: null,
-    opts: ["According", "In", "From", "By"],
-    ans: 1,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "A2+",
-    topic: "Opinion Phrases",
-    exp: "In my opinion — стійкий вступний вираз «На мою думку»."
-  },
-  {
-    q: "Who is responsible _____ buying food for our weekend camping trip?",
-    img: null,
-    opts: ["of", "with", "for", "about"],
-    ans: 2,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1",
-    topic: "Adjectives with Prepositions",
-    exp: "responsible for — відповідальний за щось."
-  },
-  {
-    q: "After weeks of training, she finally succeeded _____ winning the regional running race.",
-    img: null,
-    opts: ["in", "to", "on", "at"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2",
-    topic: "Verbs with Prepositions",
-    exp: "succeed in + V-ing — досягти успіху в чомусь."
-  },
-  {
-    q: "The soccer match was cancelled due _____ bad weather conditions.",
-    img: null,
-    opts: ["for", "to", "with", "at"],
-    ans: 1,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B1+",
-    topic: "Complex Prepositions",
-    exp: "due to — через / у результаті чогось."
-  },
-  {
-    q: "Applicants for the engineering program should be conversant _____ basic coding languages.",
-    img: null,
-    opts: ["with", "about", "in", "for"],
-    ans: 0,
-    sec: "SECTION 1: LEXICAL COMPETENCE",
-    lvl: "B2+",
-    topic: "Advanced Prepositions",
-    exp: "conversant with — обізнаний / той, хто добре знається на чомусь."
-  },
+<div class="container">
+    <header>
+        <div class="header-title">
+            <h1>Пробний НМТ з англійської мови</h1>
+            <div class="student-display" id="studentDisplay">Учень: —</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem;" id="taskProgressLabel">Завдання 1 з 6</p>
+        </div>
+        <div class="header-stats">
+            <div class="badge timer-badge" id="timerDisplay">60:00</div>
+            <div class="badge warning-badge" id="tabSwitchDisplay">Виходів із вкладки: 0</div>
+            <div class="badge" id="scoreBoard">Тестовий бал: - / 32</div>
+            <div class="badge" id="scaleBoard" style="display:none; background: #f0f3fa; color: var(--primary); border-color: #c7d2fe;">Бал НМТ/ЄВІ: -</div>
+        </div>
+    </header>
 
-  // SECTION 2: GRAMMAR COMPETENCE (26-50)
-  {
-    q: "The news about the school trip _____ announced yesterday morning.",
-    img: null,
-    opts: ["was", "were", "have been", "are"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Subject-Verb Agreement",
-    exp: "news — незлічувальний іменник однини, узгоджується з дієсловом was."
-  },
-  {
-    q: "My dream is to study history at _____ University of Cambridge.",
-    img: null,
-    opts: ["a", "an", "–", "the"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Articles with Proper Names",
-    exp: "the University of... — перед назвами навчальних закладів із прийменником of вживаємо артикль the."
-  },
-  {
-    q: "We have _____ time left before the shop closes, so let's be quick.",
-    img: null,
-    opts: ["a few", "a little", "few", "little"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Quantifiers",
-    exp: "little — трохи (вживається з незлічувальним іменником time у значенні нестачі, звідси і наступний контекст 'не барімось')."
-  },
-  {
-    q: "There are two ways to solve this math problem, but _____ of them seems easy to me.",
-    img: null,
-    opts: ["either", "neither", "other", "another"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Pronouns",
-    exp: "neither of — жоден із двох (вимагає дієслова в однині: seems)."
-  },
-  {
-    q: "The children cleaned the entire playground all by _____.",
-    img: null,
-    opts: ["their", "them", "theirs", "themselves"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Reflexive Pronouns",
-    exp: "by themselves — самостійно / без сторонньої допомоги."
-  },
-  {
-    q: "Some students walk to school, while _____ take the yellow bus.",
-    img: null,
-    opts: ["other", "another", "others", "the other"],
-    ans: 2,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1+",
-    topic: "Pronouns: Other / Others",
-    exp: "others — інші люди/діти (виступає як займенник-іменник у протиставленні some... others)."
-  },
-  {
-    q: "Look at those dark clouds in the sky! It _____ to rain very soon.",
-    img: null,
-    opts: ["is going", "will", "rains", "was raining"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "A2+",
-    topic: "Future Forms",
-    exp: "is going to — передбачення майбутньої події на основі видимих ознак у теперішньому (темні хмари)."
-  },
-  {
-    q: "Many popular rock groups formed in Britain during _____ 1970s.",
-    img: null,
-    opts: ["a", "–", "an", "the"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Articles with Decades",
-    exp: "in the 1970s — перед позначенням десятиліть завжди ставиться означений артикль the."
-  },
-  {
-    q: "I _____ my homework yet, so I cannot go out with my friends.",
-    img: null,
-    opts: ["didn't finish", "don't finish", "haven't finished", "hadn't finished"],
-    ans: 2,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Present Perfect",
-    exp: "haven't finished — дія не завершена до теперішнього моменту (маркер yet)."
-  },
-  {
-    q: "By _____ end of the week, we will finish reading this adventure book.",
-    img: null,
-    opts: ["–", "a", "an", "the"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Articles with Time Expressions",
-    exp: "by the end of — стійкий часовий вираз із означеним артиклем."
-  },
-  {
-    q: "I need to buy _____ cup of coffee because I spilled the first one.",
-    img: null,
-    opts: ["another", "other", "others", "the others"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Determiners",
-    exp: "another — ще один / інший (вживається зі злічуваними іменниками в однині)."
-  },
-  {
-    q: "My family moved to this city in _____ 2018.",
-    img: null,
-    opts: ["the", "–", "a", "an"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "A2+",
-    topic: "Articles with Years",
-    exp: "нульовий артикль — перед конкретними роками артикль не ставиться."
-  },
-  {
-    q: "Our teacher said that all project posters _____ by the time the school exhibition started.",
-    img: null,
-    opts: ["will finish", "would have been finished", "will have been finished", "is finished"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B2+",
-    topic: "Sequence of Tenses / Passive",
-    exp: "would have been finished — зсув часів у непрямій мові для Future Perfect Passive (will have been finished -> would have been finished)."
-  },
-  {
-    q: "If you _____ every day, you will easily learn how to play the guitar.",
-    img: null,
-    opts: ["will practice", "practice", "practiced", "would practice"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "A2+",
-    topic: "First Conditional",
-    exp: "practice — у підрядній частині умови (після If) вживаємо Present Simple замість майбутнього часу."
-  },
-  {
-    q: "If I had a bike, I _____ to school every day instead of taking the bus.",
-    img: null,
-    opts: ["will ride", "rode", "ride", "would ride"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Second Conditional",
-    exp: "would ride — умовне речення 2-го типу: If + Past Simple, would + V1 (нереальна умова в теперішньому)."
-  },
-  {
-    q: "You _____ bring your own lunch; there is a hot canteen at school.",
-    img: null,
-    opts: ["mustn't", "couldn't", "don't have to", "shouldn't"],
-    ans: 2,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Modals of Necessity",
-    exp: "don't have to — відсутність потреби/необхідності щось робити."
-  },
-  {
-    q: "You _____ touch these dangerous wires in the laboratory!",
-    img: null,
-    opts: ["don't have to", "mustn't", "needn't", "wouldn't"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1+",
-    topic: "Modals of Prohibition",
-    exp: "mustn't — сувора заборона або загроза небезпеки."
-  },
-  {
-    q: "I wish I _____ so many difficult tests this Friday!",
-    img: null,
-    opts: ["didn't have", "don't have", "haven't had", "won't have"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1+",
-    topic: "Wish Clauses",
-    exp: "didn't have — вираження жалю щодо теперішньої ситуації: Wish + Past Simple."
-  },
-  {
-    q: "Had the ambulance arrived earlier, the patient's recovery _____ much faster.",
-    img: null,
-    opts: ["would be", "had been", "was", "would have been"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B2+",
-    topic: "Inverted Third Conditional",
-    exp: "would have been — інверсія в 3-му типі умовних речень (Had + V3 ..., would have + V3)."
-  },
-  {
-    q: "My sister suggested _____ a board game after dinner.",
-    img: null,
-    opts: ["to play", "play", "playing", "played"],
-    ans: 2,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1+",
-    topic: "Verb Patterns",
-    exp: "suggest + V-ing — після дієслова suggest вживаємо герундій."
-  },
-  {
-    q: "The teacher made the whole class _____ the test because of cheating.",
-    img: null,
-    opts: ["rewrite", "to rewrite", "rewriting", "rewrote"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B2",
-    topic: "Causative / Bare Infinitive",
-    exp: "make + somebody + V1 — примус/спонукання вимагає голого інфінітива без часточки to."
-  },
-  {
-    q: "They agreed _____ us with our science project tomorrow.",
-    img: null,
-    opts: ["helping", "help", "helped", "to help"],
-    ans: 3,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Verb Patterns",
-    exp: "agree + to-V1 — після дієслова agree вживаємо інфінітив із часточкою to."
-  },
-  {
-    q: "She asked me if I _____ ready for the English exam.",
-    img: null,
-    opts: ["am", "will be", "was", "have been"],
-    ans: 2,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B1",
-    topic: "Reported Speech",
-    exp: "was — узгодження часів у непрямому питанні (Is -> Was)."
-  },
-  {
-    q: "He admitted to _____ a mistake during the driving test.",
-    img: null,
-    opts: ["make", "having made", "have made", "be making"],
-    ans: 1,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B2+",
-    topic: "Perfect Gerund",
-    exp: "having made — доконаний герундій після admit to вказує на дію, що відбулася раніше за основну."
-  },
-  {
-    q: "Hardly _____ the movie when the lights went out in the cinema.",
-    img: null,
-    opts: ["Had we started", "we had started", "did we start", "we started"],
-    ans: 0,
-    sec: "SECTION 2: GRAMMAR COMPETENCE",
-    lvl: "B2+",
-    topic: "Negative Inversion",
-    exp: "Hardly + Had + Subject + finished... when... — заперечна інверсія для підкреслення послідовності подій."
-  }
+    <!-- Score Summary Box (Appears after submission) -->
+    <div class="score-summary-card" id="scoreSummaryCard">
+        <h2>Тестування завершено!</h2>
+        <p style="color: var(--text-muted);">Ваші підсумкові результати пробного НМТ:</p>
+        <div class="score-boxes">
+            <div class="score-box">
+                <div class="score-box-val" id="rawScoreSummary">0 / 32</div>
+                <div class="score-box-lbl">Тестовий бал</div>
+            </div>
+            <div class="score-box">
+                <div class="score-box-val" id="scaledScoreSummary">100</div>
+                <div class="score-box-lbl">Рейтинговий бал (100–200)</div>
+            </div>
+            <div class="score-box">
+                <div class="score-box-val" id="tabSwitchSummary" style="color: #c2410c;">0</div>
+                <div class="score-box-lbl">Виходів із вкладки</div>
+            </div>
+        </div>
+        <button class="action-btn pdf-btn" onclick="downloadPDF()">Завантажити PDF із результатами</button>
+    </div>
+
+    <div class="nav-matrix-card">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;">
+            <span>Навігація по запитаннях</span>
+            <span style="color: var(--text-muted);">Синій: Дано відповідь | Жовтий: Пропущено</span>
+        </div>
+        <div class="matrix-grid" id="matrixGrid"></div>
+    </div>
+
+    <div id="quizContainer"></div>
+
+    <div class="controls">
+        <button class="action-btn secondary" id="prevBtn" onclick="changeTask(-1)">Попереднє завдання</button>
+        <div class="nav-group">
+            <button class="action-btn secondary" id="resetBtn" onclick="resetQuiz()">Скинути все</button>
+            <button class="action-btn" id="nextBtn" onclick="changeTask(1)">Наступне завдання</button>
+            <button class="action-btn submit-btn" id="submitBtn" onclick="submitTest()">Завершити тест</button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden PDF Target Template -->
+<div id="pdfReport"></div>
+
+<script>
+let studentName = "";
+let tabSwitchCount = 0;
+
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden && !testSubmitted && studentName !== "") {
+        tabSwitchCount++;
+        const badge = document.getElementById("tabSwitchDisplay");
+        if (badge) {
+            badge.innerText = `Виходів із вкладки: ${tabSwitchCount}`;
+        }
+    }
+});
+
+const conversionTable = {
+    0: 0, 1: 0, 2: 0, 3: 0, 4: 0,
+    5: 100, 6: 109, 7: 118, 8: 125, 9: 131,
+    10: 134, 11: 137, 12: 140, 13: 143, 14: 145,
+    15: 147, 16: 148, 17: 149, 18: 150, 19: 151,
+    20: 152, 21: 153, 22: 155, 23: 157, 24: 159,
+    25: 162, 26: 166, 27: 169, 28: 173, 29: 179,
+    30: 185, 31: 191, 32: 200
+};
+
+const task3FullOptions = [
+    "A) faced an official playing ban that lasted for fifty years",
+    "B) promoted physical sports as part of military training for women",
+    "C) adjusted its safety regulations to accommodate religious headwear",
+    "D) introduced shorter skirts that enabled athletes to perform complex jumps",
+    "E) removed all aesthetic and cosmetic requirements once it became an Olympic sport",
+    "F) relies heavily on aesthetic image alongside athletic skills",
+    "G) involved protests against gender-based garment restrictions",
+    "H) underwent a major outfit transformation thanks to a single athlete"
 ];
 
-let currentIndex = 0;
-let userAnswers = new Array(quizData.length).fill(null);
-let studentName = "";
+const task4FullOptions = [
+    "A) when engaging with multiple streams of information",
+    "B) but they experience another type of tiredness",
+    "C) even when the activity itself requires little physical exertion",
+    "D) that comes from prolonged exposure to online content",
+    "E) after spending more than four hours online",
+    "F) but mentally spent and overwhelmed",
+    "G) when choosing a passive rather than active pastime",
+    "H) doesn’t feel restorative despite looking effortless"
+];
+
+const quizData = [
+    {
+        taskId: 1,
+        title: "Task 1: Matching Pictures",
+        instruction: "Match the choices (A–H) to the statements/pictures (1–5). There are three extra choices.",
+        optionsBlock: `
+            <strong>A)</strong> join a live seminar<br>
+            <strong>B)</strong> sign up a teen for sports training<br>
+            <strong>C)</strong> watch a professional athletic competition<br>
+            <strong>D)</strong> take part in a voluntary donation drive<br>
+            <strong>E)</strong> meet with war veterans<br>
+            <strong>F)</strong> learn essential survival techniques<br>
+            <strong>G)</strong> participate in an open-air physical activity<br>
+            <strong>H)</strong> join a local gym
+        `,
+        text: "",
+        questions: [
+            { 
+                id: 1, 
+                prompt: "Picture 1", 
+                imageUrl: "https://lh3.googleusercontent.com/d/12tlSNbzqQVdwsGA02I_a0-EqEKT9gNy7", 
+                options: [
+                    "A) join a live seminar",
+                    "B) sign up a teen for sports training",
+                    "C) watch a professional athletic competition",
+                    "D) take part in a voluntary donation drive",
+                    "E) meet with war veterans",
+                    "F) learn essential survival techniques",
+                    "G) participate in an open-air physical activity",
+                    "H) join a local gym"
+                ], 
+                answer: "E", 
+                exp: "<strong>Text Clues:</strong> 'meet local combat veterans'.<br><strong>Explanation:</strong> Rephrases 'combat veterans' as 'war veterans'." 
+            },
+            { 
+                id: 2, 
+                prompt: "Picture 2", 
+                imageUrl: "https://lh3.googleusercontent.com/d/1JjOSpBSTEd6yin2F_sTrWPgALCXMjO3O", 
+                options: [
+                    "A) join a live seminar",
+                    "B) sign up a teen for sports training",
+                    "C) watch a professional athletic competition",
+                    "D) take part in a voluntary donation drive",
+                    "E) meet with war veterans",
+                    "F) learn essential survival techniques",
+                    "G) participate in an open-air physical activity",
+                    "H) join a local gym"
+                ], 
+                answer: "G", 
+                exp: "<strong>Text Clues:</strong> 'outdoor fitness session', 'green lawn'.<br><strong>Explanation:</strong> Rephrases 'outdoor' as 'open-air'." 
+            },
+            { 
+                id: 3, 
+                prompt: "Picture 3", 
+                imageUrl: "https://lh3.googleusercontent.com/d/1C2i3g6JTSbnxXbQe2WQ025QuOODwikdX", 
+                options: [
+                    "A) join a live seminar",
+                    "B) sign up a teen for sports training",
+                    "C) watch a professional athletic competition",
+                    "D) take part in a voluntary donation drive",
+                    "E) meet with war veterans",
+                    "F) learn essential survival techniques",
+                    "G) participate in an open-air physical activity",
+                    "H) join a local gym"
+                ], 
+                answer: "F", 
+                exp: "<strong>Text Clues:</strong> 'vital life-saving skills'.<br><strong>Explanation:</strong> Generalizes skills to 'essential survival techniques'." 
+            },
+            { 
+                id: 4, 
+                prompt: "Picture 4", 
+                imageUrl: "https://lh3.googleusercontent.com/d/1ndZvOohVKwYqO97A1bgAEOf1u4elZOyz", 
+                options: [
+                    "A) join a live seminar",
+                    "B) sign up a teen for sports training",
+                    "C) watch a professional athletic competition",
+                    "D) take part in a voluntary donation drive",
+                    "E) meet with war veterans",
+                    "F) learn essential survival techniques",
+                    "G) participate in an open-air physical activity",
+                    "H) join a local gym"
+                ], 
+                answer: "B", 
+                exp: "<strong>Text Clues:</strong> 'open for ages 10–16'.<br><strong>Explanation:</strong> Rephrases 'ages 10–16' as 'a teen'." 
+            },
+            { 
+                id: 5, 
+                prompt: "Picture 5", 
+                imageUrl: "https://lh3.googleusercontent.com/d/1VgWNYimHdO5LgBCwMmBMkPCkQ72UbY-c", 
+                options: [
+                    "A) join a live seminar",
+                    "B) sign up a teen for sports training",
+                    "C) watch a professional athletic competition",
+                    "D) take part in a voluntary donation drive",
+                    "E) meet with war veterans",
+                    "F) learn essential survival techniques",
+                    "G) participate in an open-air physical activity",
+                    "H) join a local gym"
+                ], 
+                answer: "D", 
+                exp: "<strong>Text Clues:</strong> 'Mobile Blood Bank Van', 'your donation'.<br><strong>Explanation:</strong> Rephrases blood drive as 'voluntary donation drive'." 
+            }
+        ]
+    },
+    {
+        taskId: 2,
+        title: "Task 2: Multiple Choice",
+        instruction: "Read the text and choose the correct answer (A, B, C, or D) for questions 6–10.",
+        text: `
+            <p><strong>Who Invented the Sandwich?</strong></p>
+            <p>Do we call a sandwich a sandwich because of the 4th Earl of Sandwich? Yes, we do. But was he the first person in human history to come up with the clever idea of putting a filling between slices of bread? Not at all.</p>
+            <p>The truth is that historians do not know the name of the original inventor, as the concept of combining bread with other foods has existed in various cultures for thousands of years. One of the earliest documented sandwich-eaters was Hillel the Elder, a famous rabbi and scholar who lived in Jerusalem during the first century B.C. Ancient texts recount how he created layered snacks using Paschal lamb, bitter herbs, and flat unleavened matzoh bread during religious traditions. To this day, participants in the annual Passover Seder remember his legacy by preparing similar matzoh sandwiches.</p>
+            <p>Wrapping fillings in flatbread also has a long, rich tradition across the Mediterranean and the Middle East. Culinary historians note that rolling flatbread around meat or vegetables is an ancient custom in Turkish food culture. During the mid-18th century, John Montagu, the 4th Earl of Sandwich, traveled extensively throughout the Ottoman Empire. Researchers believe that this journey inspired him to bring the convenient practice back home to England. Upon his return, the nobleman allegedly asked restaurant servers in London to bring him cold meat placed neatly between two slices of toasted bread so he could eat without interrupting his card games.</p>
+            <p>It remains unclear exactly how Montagu became the official namesake of the dish, but the term quickly gained popularity. The first written record of the word "sandwich" appears in a 1762 diary entry by the English historian Edward Gibbon, who observed men eating cold meat and bread in a club. Shortly after, French travel writers spread gossipy stories about the Earl’s gambling habits, further cementing the association in the public mind. By the mid-19th century, the word had become so common in the English language that people even started using it as a verb to describe inserting an object between two other things.</p>
+            <p>As English speakers adopted the word, the sandwich evolved rapidly in the 20th century, particularly in the United States. Mass-manufactured peanut butter turned the peanut butter and jelly sandwich into a legendary school lunch <u><strong>staple</strong></u> during the 1920s. Around the same time, regional specialties emerged, such as the famous Louisiana "po' boy" — a hearty sandwich served on French bread that was reportedly given away for free to striking streetcar drivers in New Orleans. By the late 20th century, major national chain restaurants began competing for global dominance, transforming a simple street food into a multi-billion-dollar fast-food industry.</p>
+        `,
+        questions: [
+            {
+                id: 6,
+                prompt: "6. What inspired John Montagu to ask for meat between two slices of bread?",
+                options: [
+                    "A) A tradition as old as Hillel the Elder’s time.",
+                    "B) Signature Turkish food.",
+                    "C) Traditional rules of Passover Seder observed in Jerusalem.",
+                    "D) Culinary habits he observed in his travels in the Middle East."
+                ],
+                answer: "D",
+                exp: "<strong>Explanation:</strong> Paragraph 3 states that John Montagu traveled extensively throughout the Ottoman Empire (located in the Middle East) and that researchers believe this journey inspired him to bring the convenient practice of wrapping fillings in flatbread back home to England."
+            },
+            {
+                id: 7,
+                prompt: "7. According to the text, which of the following is NOT TRUE about the history of the sandwich?",
+                options: [
+                    "A) Hillel the Elder used unleavened bread to make early versions of wrapped snacks.",
+                    "B) John Montagu is acknowledged as the original author of the sandwich concept.",
+                    "C) By the 19th century, \"sandwich\" was used as a verb in English.",
+                    "D) The term \"sandwich\" appeared in writing before the French published stories about Montagu."
+                ],
+                answer: "B",
+                exp: "<strong>Explanation:</strong> Paragraph 1 explicitly states that Montagu was not the first person in human history to come up with the idea, making statement B false."
+            },
+            {
+                id: 8,
+                prompt: "8. What can be inferred from paragraph 3 about John Montagu’s eating habits at the gambling table?",
+                options: [
+                    "A) He prioritized keeping his hands clean over formal dining etiquette.",
+                    "B) He couldn’t afford full meals at restaurants due to gambling debts.",
+                    "C) He ate sandwiches because he followed a traditional Ottoman diet.",
+                    "D) He inspired club members to order the same food while playing cards."
+                ],
+                answer: "A",
+                exp: "<strong>Explanation:</strong> Paragraph 3 notes that he asked for cold meat placed neatly between toasted bread so he could eat without interrupting his card games."
+            },
+            {
+                id: 9,
+                prompt: "9. The word \"staple\" in paragraph 5 is closest in meaning to _______.",
+                options: [
+                    "A) a rare luxury item",
+                    "B) a basic and essential element",
+                    "C) an expensive restaurant dish",
+                    "D) a temporary culinary trend"
+                ],
+                answer: "B",
+                exp: "<strong>Explanation:</strong> In English, a 'staple' refers to a fundamental, main, or basic item that forms a major part of a routine."
+            },
+            {
+                id: 10,
+                prompt: "10. What is the main idea of the article?",
+                options: [
+                    "A) The 4th Earl of Sandwich was the sole creator of the modern fast-food industry.",
+                    "B) The concept of putting food between bread existed long before its modern name.",
+                    "C) The term \"sandwich\" became popular because of an 18th-century English aristocrat.",
+                    "D) Modern fast-food meals are based on ancient Middle Eastern traditions."
+                ],
+                answer: "B",
+                exp: "<strong>Explanation:</strong> The article focuses on explaining that while the word 'sandwich' comes from the Earl, the practice spans thousands of years of human history."
+            }
+        ]
+    },
+    {
+        taskId: 3,
+        title: "Task 3: Multiple Matching",
+        instruction: "Read the text below. Match choices (A–H) to (11–16). There are three extra choices which you do not need to use.",
+        optionsBlock: `
+            <strong>Which of the options A–H matches the information in the text?</strong><br>
+            <em>This section / movement ________.</em><br><br>
+            <strong>A)</strong> faced an official playing ban that lasted for fifty years<br>
+            <strong>B)</strong> promoted physical sports as part of military training for women<br>
+            <strong>C)</strong> adjusted its safety regulations to accommodate religious headwear<br>
+            <strong>D)</strong> introduced shorter skirts that enabled athletes to perform complex jumps<br>
+            <strong>E)</strong> removed all aesthetic and cosmetic requirements once it became an Olympic sport<br>
+            <strong>F)</strong> relies heavily on aesthetic image alongside athletic skills<br>
+            <strong>G)</strong> involved protests against gender-based garment restrictions<br>
+            <strong>H)</strong> underwent a major outfit transformation thanks to a single athlete
+        `,
+        text: "",
+        questions: [
+            { 
+                id: 11, 
+                prompt: "11. Tennis",
+                excerpt: "...In the early 1900s, female tennis players competed in long skirts and corsets, which resticted their movement. Then, French player Suzanne Lenglen revolutionized women’s sportswear by swapping these heavy outfits for short-sleeved pleated dresses and a bandeau. Today, tennis clothing prioritizes fast movement, while players like Venus Williams even launch their own fashion lines to add not just the skill, but also their own aethetic on court.",
+                options: task3FullOptions, 
+                answer: "H", 
+                exp: "<strong>Explanation:</strong> French player Suzanne Lenglen single-handedly revolutionized women's tennis clothing." 
+            },
+            { 
+                id: 12, 
+                prompt: "12. Synchronised Swimming",
+                excerpt: "...Now famous for glitzy, colorful costumes and waterproof makeup, synchronised swimming took time to develop its signature look. Introduced to the Olympics in 1984, the sport places great value on visual presentation. Athletes acknowledge that achieving the ideal artistic appearance requires meticulous attention to their hair, swimsuits, and overall image.",
+                options: task3FullOptions, 
+                answer: "F", 
+                exp: "<strong>Explanation:</strong> The text emphasizes that the sport places great value on visual presentation." 
+            },
+            { 
+                id: 13, 
+                prompt: "13. Handball",
+                excerpt: "...Women’s beach handball players have recently fought against strict clothing regulations. In Brazil and Spain, athletes protested rules forcing them to wear revealing bikinis while male players could wear loose shorts. These protests raised public debate about sexism in sports gear and forced authorities to rethink standard kit requirements.",
+                options: task3FullOptions, 
+                answer: "G", 
+                exp: "<strong>Explanation:</strong> Female players explicitly protested rules forcing them to wear bikinis." 
+            },
+            { 
+                id: 14, 
+                prompt: "14. Women’s Football (Early History)",
+                excerpt: "...In the late 19th century, UK suffragettes advocated for women’s football as a way to reject restrictive Victorian fashion. However, in 1921, the Football Association banned women from playing on official pitches, declaring the sport unsuitable for females. This ban remained in place for half a century until it was finally repealed in 1971.",
+                options: task3FullOptions, 
+                answer: "A", 
+                exp: "<strong>Explanation:</strong> The ban lasted from 1921 until 1971 (50 years)." 
+            },
+            { 
+                id: 15, 
+                prompt: "15. Football Gear Update",
+                excerpt: "...Modern football regulations have adapted to respect religious diversity among female athletes. FIFA originally prohibited headscarves due to safety concerns regarding head and neck injuries. However, in 2014, the organization officially updated its policies to allow players to wear hijabs during international matches.",
+                options: task3FullOptions, 
+                answer: "C", 
+                exp: "<strong>Explanation:</strong> FIFA updated safety policies on headscarves in 2014." 
+            },
+            { 
+                id: 16, 
+                prompt: "16. Figure Skating",
+                excerpt: "...Figure skating costumes have evolved from heavy winter coats to high-performance stretch fabrics. In the 1920s, Norwegian skater Sonja Henie introduced shorter skirts above the knee, which allowed for unprecedented freedom of movement and technical jumps. Her daring style permanently changed the sport's outfit standards, paving the way for modern athletic artistry.",
+                options: task3FullOptions, 
+                answer: "D", 
+                exp: "<strong>Explanation:</strong> Sonja Henie introduced skirts above the knee, enabling athletes to perform complex technical jumps." 
+            }
+        ]
+    },
+    {
+        taskId: 4,
+        title: "Task 4: Gap Fill (Scrolling Fatigue)",
+        instruction: "Read the text below. Choose from (A–H) the one which best fits each space (17–22). There are two extra choices which you do not need to use.",
+        optionsBlock: `
+            <strong>A)</strong> when engaging with multiple streams of information<br>
+            <strong>B)</strong> but they experience another type of tiredness<br>
+            <strong>C)</strong> even when the activity itself requires little physical exertion<br>
+            <strong>D)</strong> that comes from prolonged exposure to online content<br>
+            <strong>E)</strong> after spending more than four hours online<br>
+            <strong>F)</strong> but mentally spent and overwhelmed<br>
+            <strong>G)</strong> when choosing a passive rather than active pastime<br>
+            <strong>H)</strong> doesn’t feel restorative despite looking effortless
+        `,
+        text: `
+            <p>Many people describe a specific kind of depletion after scrolling through social media: physically unchanged, (17) <strong>________</strong>. Recent HCI survey data suggests that low-effort digital activity can still be experienced as cognitively demanding, even when it feels completely passive.</p>
+            <p>In a 2025 study on digital life, half of the respondents described their energy levels as exhausted (18) <strong>________</strong>. Another survey examining attention under digital load revealed that 61% of users felt mentally saturated (19) <strong>________</strong>. Surprisingly, a related fatigue pattern appears even on days without hard work, with over a fifth of participants reporting constant exhaustion.</p>
+            <p>Together, these findings suggest that mental exhaustion occurs (20) <strong>________</strong>. Scrolling may appear easy from the outside, but it actually involves sustained input, rapid shifts in attention, and continual comparison.</p>
+            <p>Users often report that their minds feel cluttered afterwards, noting that digital activity (21) <strong>________</strong>. While these survey figures reflect self-reported reflection rather than a direct cause-and-effect link, they clearly highlight a growing trend. Feeling drained after screen time simply reflects the heavy cognitive load (22) <strong>________</strong>.</p>
+        `,
+        questions: [
+            { 
+                id: 17, 
+                prompt: "17. Gap (17)",
+                excerpt: "...Many people describe a specific kind of depletion after scrolling through social media: physically unchanged, (17) ________...",
+                options: task4FullOptions, 
+                answer: "F", 
+                exp: "<strong>Explanation:</strong> Parallel adjective structure matching 'physically unchanged'." 
+            },
+            { 
+                id: 18, 
+                prompt: "18. Gap (18)",
+                excerpt: "...In a 2025 study on digital life, half of the respondents described their energy levels as exhausted (18) ________...",
+                options: task4FullOptions, 
+                answer: "E", 
+                exp: "<strong>Explanation:</strong> Prepositional phrase specifying duration ('after + -ing')." 
+            },
+            { 
+                id: 19, 
+                prompt: "19. Gap (19)",
+                excerpt: "...Another survey examining attention under digital load revealed that 61% of users felt mentally saturated (19) ________...",
+                options: task4FullOptions, 
+                answer: "A", 
+                exp: "<strong>Explanation:</strong> Condition clause specifying cognitive trigger." 
+            },
+            { 
+                id: 20, 
+                prompt: "20. Gap (20)",
+                excerpt: "...Together, these findings suggest that mental exhaustion occurs (20) ________...",
+                options: task4FullOptions, 
+                answer: "C", 
+                exp: "<strong>Explanation:</strong> Concessive clause: mental fatigue occurs despite minimal physical effort." 
+            },
+            { 
+                id: 21, 
+                prompt: "21. Gap (21)",
+                excerpt: "...Users often report that their minds feel cluttered afterwards, noting that digital activity (21) ________...",
+                options: task4FullOptions, 
+                answer: "H", 
+                exp: "<strong>Explanation:</strong> Provides the necessary finite predicate verb phrase ('doesn't feel')." 
+            },
+            { 
+                id: 22, 
+                prompt: "22. Gap (22)",
+                excerpt: "...Feeling drained after screen time simply reflects the heavy cognitive load (22) ________...",
+                options: task4FullOptions, 
+                answer: "D", 
+                exp: "<strong>Explanation:</strong> Defining relative clause starting with 'that'." 
+            }
+        ]
+    },
+    {
+        taskId: 5,
+        title: "Task 5: Use of English — Lexis",
+        instruction: "Choose the correct word for gaps 23–27.",
+        text: `
+            <p><strong>Why Are Some Hooked on Netflix?</strong></p>
+            <p>Netflix is the leading streaming platform, but its success (23) <strong>________</strong> on its ability to recommend the right content. The system uses algorithms to (24) <strong>________</strong> viewer behavior and (25) <strong>________</strong> out unsuitable options. When users select a show, the automated program gets smarter, preventing subscribers from becoming (26) <strong>________</strong> by endless choices. This massive dataset also helps executives (27) <strong>________</strong> key decisions about which original shows to produce next.</p>
+        `,
+        questions: [
+            { 
+                id: 23, 
+                prompt: "23. Gap (23)",
+                excerpt: "...Netflix is the leading streaming platform, but its success (23) ________ on its ability to recommend the right content.",
+                options: ["A) relies", "B) insists", "C) revolves", "D) recounts"], 
+                answer: "A", 
+                exp: "<strong>Phrasal Verb:</strong> rely on." 
+            },
+            { 
+                id: 24, 
+                prompt: "24. Gap (24)",
+                excerpt: "...The system uses algorithms to (24) ________ viewer behavior...",
+                options: ["A) access", "B) assess", "C) assist", "D) affect"], 
+                answer: "B", 
+                exp: "<strong>Vocabulary:</strong> assess = evaluate / analyze." 
+            },
+            { 
+                id: 25, 
+                prompt: "25. Gap (25)",
+                excerpt: "...and (25) ________ out unsuitable options.",
+                options: ["A) weed", "B) check", "C) rule", "D) keep"], 
+                answer: "A", 
+                exp: "<strong>Phrasal Verb:</strong> weed out = eliminate / filter out." 
+            },
+            { 
+                id: 26, 
+                prompt: "26. Gap (26)",
+                excerpt: "...preventing subscribers from becoming (26) ________ by endless choices.",
+                options: ["A) in danger of", "B) at risk of", "C) on threat of", "D) under fear of"], 
+                answer: "B", 
+                exp: "<strong>Prepositional Phrase:</strong> at risk of + V-ing." 
+            },
+            { 
+                id: 27, 
+                prompt: "27. Gap (27)",
+                excerpt: "...This massive dataset also helps executives (27) ________ key decisions about which original shows to produce next.",
+                options: ["A) shape", "B) form", "C) build", "D) construct"], 
+                answer: "A", 
+                exp: "<strong>Collocation:</strong> shape decisions." 
+            }
+        ]
+    },
+    {
+        taskId: 6,
+        title: "Task 6: Use of English — Grammar",
+        instruction: "Choose the correct grammatical form for gaps 28–32.",
+        text: `
+            <p><strong>The Hedonic Treadmill</strong></p>
+            <p>The hedonic treadmill shows that an individual’s happiness usually returns to its baseline after major events. Although a promotion makes people (28) <strong>________</strong> happier at first, it rarely changes their long-term mood. Soon, they adjust to their new status, (29) <strong>________</strong> even more joy to feel satisfied. Fortunately, (30) <strong>________</strong> negative experiences leave us permanently depressed because our baseline (31) <strong>________</strong> back over time. In fact, (32) <strong>________</strong> we achieve, the higher our expectations become, making long-term happiness gains difficult to sustain.</p>
+        `,
+        questions: [
+            { 
+                id: 28, 
+                prompt: "28. Gap (28)",
+                excerpt: "...Although a promotion makes people (28) ________ happier at first, it rarely changes their long-term mood.",
+                options: ["A) feel", "B) to feel", "C) feeling", "D) felt"], 
+                answer: "A", 
+                exp: "<strong>Complex Object:</strong> make + object + bare infinitive." 
+            },
+            { 
+                id: 29, 
+                prompt: "29. Gap (29)",
+                excerpt: "...Soon, they adjust to their new status, (29) ________ even more joy to feel satisfied.",
+                options: ["A) desire", "B) desiring", "C) to desire", "D) desired"], 
+                answer: "B", 
+                exp: "<strong>Participle Clause:</strong> Present Participle (-ing) showing consequence." 
+            },
+            { 
+                id: 30, 
+                prompt: "30. Gap (30)",
+                excerpt: "...Fortunately, (30) ________ negative experiences leave us permanently depressed...",
+                options: ["A) few", "B) a few", "C) little", "D) a little"], 
+                answer: "A", 
+                exp: "<strong>Quantifiers:</strong> Countable plural noun with negative meaning ('almost none')." 
+            },
+            { 
+                id: 31, 
+                prompt: "31. Gap (31)",
+                excerpt: "...because our baseline (31) ________ back over time.",
+                options: ["A) shifted", "B) shifts", "C) was shifting", "D) had shifted"], 
+                answer: "B", 
+                exp: "<strong>Verb Tense:</strong> Present Simple for general facts." 
+            },
+            { 
+                id: 32, 
+                prompt: "32. Gap (32)",
+                excerpt: "...In fact, (32) ________ we achieve, the higher our expectations become, making long-term happiness gains difficult to sustain.",
+                options: ["A) more", "B) the most", "C) the more", "D) as much"], 
+                answer: "C", 
+                exp: "<strong>Comparative Structure:</strong> The + comparative..., the + comparative..." 
+            }
+        ]
+    }
+];
+
+let currentTaskIdx = 0;
+const userAnswers = {};
+const skippedStatus = {};
+let testSubmitted = false;
+
+let timeRemaining = 60 * 60;
 let timerInterval = null;
-let timeRemaining = 45 * 60;
-let totalTimeSpent = 0;
 
-// Змінні для трекінгу переходів
-let tabSwitchCount = 0;
-let isQuizActive = false;
-
-function toggleStartButton() {
-  const checkbox = document.getElementById("agreeRulesCheckbox");
-  document.getElementById("startQuizBtn").disabled = !checkbox.checked;
-}
-
-function startQuiz() {
-  const nameInput = document.getElementById("studentNameInput").value.trim();
-  if (!nameInput) {
-    alert("Будь ласка, введіть ваші Прізвище та Ім'я перед початком тесту.");
-    return;
-  }
-  studentName = nameInput;
-
-  document.getElementById("startScreen").classList.remove("active");
-  document.getElementById("quizScreen").classList.add("active");
-
-  isQuizActive = true;
-  initIntegrityTracking();
-
-  startTimer();
-  renderNavMap();
-  renderQuestion();
-}
-
-// Система трекінгу активності вкладки / вікна
-function initIntegrityTracking() {
-  document.addEventListener("visibilitychange", () => {
-    if (isQuizActive && document.hidden) {
-      tabSwitchCount++;
+function startAssessment() {
+    const input = document.getElementById('studentNameInput').value.trim();
+    if (!input) {
+        alert("Будь ласка, введіть ваше ім'я для початку.");
+        return;
     }
-  });
-
-  window.addEventListener("blur", () => {
-    if (isQuizActive) {
-      tabSwitchCount++;
-    }
-  });
+    studentName = input;
+    document.getElementById('studentDisplay').innerText = `Учень: ${studentName}`;
+    document.getElementById('nameModal').style.display = 'none';
+    
+    startTimer();
+    renderQuiz();
 }
 
 function startTimer() {
-  const display = document.getElementById("timerDisplay");
-  const badge = document.getElementById("timerBadge");
-
-  timerInterval = setInterval(() => {
-    timeRemaining--;
-    totalTimeSpent++;
-
-    const mins = Math.floor(timeRemaining / 60);
-    const secs = timeRemaining % 60;
-    display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-    if (timeRemaining <= 300) {
-      badge.classList.add("warning");
-    }
-
-    if (timeRemaining <= 0) {
-      clearInterval(timerInterval);
-      alert("Час вичерпано! Тест буде автоматично завершено.");
-      finishQuiz();
-    }
-  }, 1000);
+    timerInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert("Час вичерпано! Ваш тест буде відправлено автоматично.");
+            submitTest();
+            return;
+        }
+        timeRemaining--;
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        document.getElementById('timerDisplay').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
 }
 
-function renderNavMap() {
-  const mapContainer = document.getElementById("navMap");
-  mapContainer.innerHTML = "";
+function renderMatrix() {
+    const grid = document.getElementById('matrixGrid');
+    grid.innerHTML = '';
 
-  quizData.forEach((_, idx) => {
-    const cell = document.createElement("div");
-    cell.className = "nav-cell";
-    cell.textContent = idx + 1;
+    quizData.forEach((task, tIdx) => {
+        task.questions.forEach(q => {
+            const qNum = q.id;
+            const btn = document.createElement('button');
+            btn.className = 'matrix-btn';
+            btn.innerText = qNum;
 
-    if (idx === currentIndex) {
-      cell.classList.add("active");
-    }
+            if (userAnswers[qNum]) {
+                btn.classList.add('answered');
+            } else if (skippedStatus[qNum]) {
+                btn.classList.add('skipped');
+            }
 
-    const state = userAnswers[idx];
-    if (state !== null && state !== -1) {
-      cell.classList.add("answered");
-    } else if (state === -1) {
-      cell.classList.add("skipped");
-    }
+            btn.onclick = () => {
+                currentTaskIdx = tIdx;
+                renderQuiz();
+                const qEl = document.getElementById(`q-block-${qNum}`);
+                if (qEl) qEl.scrollIntoView({ behavior: 'smooth' });
+            };
 
-    cell.onclick = () => jumpToQuestion(idx);
-    mapContainer.appendChild(cell);
-  });
+            grid.appendChild(btn);
+        });
+    });
 }
 
-function jumpToQuestion(index) {
-  currentIndex = index;
-  renderQuestion();
-}
+function renderQuiz() {
+    const container = document.getElementById('quizContainer');
+    container.innerHTML = '';
 
-function renderQuestion() {
-  const item = quizData[currentIndex];
+    const task = quizData[currentTaskIdx];
+    document.getElementById('taskProgressLabel').innerText = `Завдання ${currentTaskIdx + 1} з ${quizData.length}`;
 
-  document.getElementById("progressBar").style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
-  document.getElementById("sectionBadge").textContent = item.sec;
-  document.getElementById("qCounter").textContent = `Питання ${currentIndex + 1} з ${quizData.length}`;
-  document.getElementById("questionText").textContent = `${currentIndex + 1}. ${item.q}`;
+    const card = document.createElement('div');
+    card.className = 'task-card active';
 
-  // Обробка зображення
-  const imgWrap = document.getElementById("questionImageWrap");
-  const imgElem = document.getElementById("questionImage");
-  if (item.img) {
-    imgElem.src = item.img;
-    imgWrap.style.display = "block";
-  } else {
-    imgWrap.style.display = "none";
-    imgElem.src = "";
-  }
-
-  const grid = document.getElementById("optionsGrid");
-  grid.innerHTML = "";
-
-  const letters = ["A", "B", "C", "D"];
-  item.opts.forEach((optText, optIdx) => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
+    let html = `<div class="task-header">${task.title}</div>`;
+    html += `<div class="task-instruction">${task.instruction}</div>`;
     
-    if (userAnswers[currentIndex] === optIdx) {
-      btn.classList.add("selected");
+    if (task.optionsBlock) {
+        html += `<div class="options-list-box">${task.optionsBlock}</div>`;
+    }
+    
+    if (task.text) {
+        html += `<div class="reading-text">${task.text}</div>`;
     }
 
-    btn.onclick = () => selectOption(optIdx);
+    task.questions.forEach(q => {
+        html += `
+            <div class="question-block" id="q-block-${q.id}">
+                <div class="question-title">${q.prompt}</div>
+        `;
 
-    btn.innerHTML = `
-      <span class="opt-letter">${letters[optIdx]}</span>
-      <span>${optText}</span>
-    `;
-    grid.appendChild(btn);
-  });
+        if (q.excerpt) {
+            html += `<div class="question-excerpt">${q.excerpt}</div>`;
+        }
 
-  document.getElementById("prevBtn").disabled = (currentIndex === 0);
-  
-  const isLastQuestion = (currentIndex === quizData.length - 1);
-  const finishBtn = document.getElementById("finishBtn");
-  const nextBtn = document.getElementById("nextBtn");
+        if (q.imageUrl) {
+            html += `<img src="${q.imageUrl}" alt="Task Image ${q.id}" class="question-img">`;
+        }
 
-  if (isLastQuestion) {
-    finishBtn.style.display = "inline-flex";
-    nextBtn.style.display = "none";
-  } else {
-    finishBtn.style.display = "none";
-    nextBtn.style.display = "inline-flex";
-  }
+        html += `<div class="options-grid">`;
+        
+        q.options.forEach(opt => {
+            const optCode = opt.length > 2 ? opt.charAt(0) : opt;
+            const isSelected = userAnswers[q.id] === optCode ? 'selected' : '';
+            
+            html += `
+                <button class="option-btn ${isSelected}" 
+                        data-qid="${q.id}" 
+                        data-opt="${optCode}"
+                        onclick="selectOption(${q.id}, '${optCode}', this)">
+                    ${opt}
+                </button>
+            `;
+        });
 
-  renderNavMap();
-}
+        const isSkipped = skippedStatus[q.id] ? 'Скасувати пропуск' : 'Пропустити і повернутися пізніше';
 
-function selectOption(optIdx) {
-  userAnswers[currentIndex] = optIdx;
-  renderQuestion();
-}
+        html += `
+                </div>
+                <button class="skip-btn" onclick="toggleSkip(${q.id})">${isSkipped}</button>
+                <div class="explanation-box" id="exp-${q.id}">${q.exp}</div>
+            </div>
+        `;
+    });
 
-function skipQuestion() {
-  if (userAnswers[currentIndex] === null) {
-    userAnswers[currentIndex] = -1;
-  }
-  
-  if (currentIndex < quizData.length - 1) {
-    currentIndex++;
-    renderQuestion();
-  } else {
-    renderNavMap();
-  }
-}
+    card.innerHTML = html;
+    container.appendChild(card);
 
-function nextQuestion() {
-  if (currentIndex < quizData.length - 1) {
-    currentIndex++;
-    renderQuestion();
-  }
-}
+    document.getElementById('prevBtn').style.visibility = currentTaskIdx === 0 ? 'hidden' : 'visible';
+    document.getElementById('nextBtn').style.display = currentTaskIdx === quizData.length - 1 ? 'none' : 'inline-block';
+    
+    renderMatrix();
 
-function prevQuestion() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    renderQuestion();
-  }
-}
-
-function finishQuiz() {
-  const unansweredOrSkipped = userAnswers.filter(ans => ans === null || ans === -1).length;
-  if (unansweredOrSkipped > 0 && timeRemaining > 0) {
-    const confirmFinish = confirm(`У вас залишилося ${unansweredOrSkipped} неопрацьованих / пропущених питань. Завершити тест зараз?`);
-    if (!confirmFinish) return;
-  }
-
-  isQuizActive = false; // Зупиняємо відстеження
-  clearInterval(timerInterval);
-
-  document.getElementById("quizScreen").classList.remove("active");
-  document.getElementById("resultsScreen").classList.add("active");
-
-  calculateAndShowResults();
-}
-
-function calculateAndShowResults() {
-  let score = 0;
-  quizData.forEach((item, idx) => {
-    if (userAnswers[idx] === item.ans) {
-      score++;
+    if (testSubmitted) {
+        applySubmissionStyles();
     }
-  });
+}
 
-  const percentage = Math.round((score / quizData.length) * 100);
-  const incorrect = quizData.length - score;
+function selectOption(qid, optCode, btn) {
+    if (testSubmitted) return;
+    userAnswers[qid] = optCode;
+    delete skippedStatus[qid];
 
-  const minsSpent = Math.floor(totalTimeSpent / 60);
-  const secsSpent = totalTimeSpent % 60;
-  const timeStr = `${minsSpent.toString().padStart(2, '0')}:${secsSpent.toString().padStart(2, '0')}`;
+    const parent = btn.closest('.options-grid');
+    parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    
+    renderMatrix();
+}
 
-  document.getElementById("resultsSubtext").textContent = `Студент: ${studentName}`;
-  document.getElementById("scorePercent").textContent = `${percentage}%`;
-  document.getElementById("correctCount").textContent = score;
-  document.getElementById("incorrectCount").textContent = incorrect;
-  document.getElementById("timeSpent").textContent = timeStr;
+function toggleSkip(qid) {
+    if (testSubmitted) return;
+    if (skippedStatus[qid]) {
+        delete skippedStatus[qid];
+    } else {
+        delete userAnswers[qid];
+        skippedStatus[qid] = true;
+    }
+    renderQuiz();
+}
 
-  // Виведення кількості виходів та виділення червоним за наявності порушень
-  const switchesBox = document.getElementById("switchesStatBox");
-  document.getElementById("tabSwitchesCount").textContent = tabSwitchCount;
-  if (tabSwitchCount > 0) {
-    switchesBox.classList.add("has-violations");
-  }
+function changeTask(dir) {
+    currentTaskIdx += dir;
+    renderQuiz();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  document.getElementById("scoreCircle").style.background = 
-    `conic-gradient(var(--primary-color) ${percentage}%, #e2e8f0 ${percentage}%)`;
+function submitTest() {
+    if (testSubmitted) return;
 
-  const feedbackTitle = document.getElementById("feedbackLevelTitle");
-  const feedbackDesc = document.getElementById("feedbackLevelDesc");
-
-  if (percentage >= 85) {
-    feedbackTitle.textContent = "Чудовий результат! (Рівень B2 / B2+)";
-    feedbackDesc.textContent = "Ви продемонстрували високий рівень лексичної та граматичної компетенції. Ви чудово орієнтуєтеся у складних граматичних структурах та академічній лексиці.";
-  } else if (percentage >= 65) {
-    feedbackTitle.textContent = "Добрий результат! (Рівень B1+ / B2)";
-    feedbackDesc.textContent = "У вас міцна базова підготовка, але є прогалини у складніших темах (інверсія, складні умовні речення, специфічні прийменникові сполучення).";
-  } else if (percentage >= 45) {
-    feedbackTitle.textContent = "Задовільний результат (Рівень B1)";
-    feedbackDesc.textContent = "Ви добре знаєте базову граматику, але рекомендується систематично повторити часові форми, фразові дієслова та стійкі словосполучення.";
-  } else {
-    feedbackTitle.textContent = "Потребує систематичного опрацювання (Рівень A2 / A2+)";
-    feedbackDesc.textContent = "Рекомендується розпочати комплексне повторення з основ граматики та базового лексичного запасу.";
-  }
-
-  const reviewList = document.getElementById("reviewList");
-  reviewList.innerHTML = "";
-
-  const letters = ["A", "B", "C", "D"];
-
-  quizData.forEach((item, idx) => {
-    const userAns = userAnswers[idx];
-    const isCorrect = (userAns === item.ans);
-
-    const reviewItem = document.createElement("div");
-    reviewItem.className = `review-item ${isCorrect ? 'is-correct' : 'is-incorrect'}`;
-
-    let userAnsText = "Не надано (пропущено)";
-    if (userAns !== null && userAns !== -1) {
-      userAnsText = `${letters[userAns]}) ${item.opts[userAns]}`;
+    const unanswered = 32 - Object.keys(userAnswers).length;
+    if (unanswered > 0) {
+        if (!confirm(`У вас залишилося ${unanswered} незаповнених запитань. Ви впевнені, що хочете завершити тест?`)) {
+            return;
+        }
     }
 
-    const correctAnsText = `${letters[item.ans]}) ${item.opts[item.ans]}`;
+    testSubmitted = true;
+    clearInterval(timerInterval);
 
-    let imgHtml = item.img ? `<img src="${item.img}" alt="Question Media" class="review-img">` : '';
+    let rawScore = 0;
+    quizData.forEach(task => {
+        task.questions.forEach(q => {
+            if (userAnswers[q.id] === q.answer) {
+                rawScore++;
+            }
+        });
+    });
 
-    reviewItem.innerHTML = `
-      <div class="q-title">${idx + 1}. ${item.q}</div>
-      ${imgHtml}
-      <div class="ans-info">Ваша відповідь: <span class="${isCorrect ? 'ans-correct' : 'ans-wrong'}">${userAnsText}</span></div>
-      ${!isCorrect ? `<div class="ans-info">Правильна відповідь: <span class="ans-correct">${correctAnsText}</span></div>` : ''}
-      <div class="exp-info">
-        <div class="exp-tags">
-          <span class="tag tag-level">${item.lvl}</span>
-          <span class="tag tag-topic">${item.topic}</span>
-        </div>
-        <strong>Пояснення:</strong> ${item.exp}
-      </div>
-    `;
+    const scaledScore = conversionTable[rawScore] || 0;
 
-    reviewList.appendChild(reviewItem);
-  });
+    document.getElementById('scoreBoard').innerText = `Тестовий бал: ${rawScore} / 32`;
+    const scaleBoard = document.getElementById('scaleBoard');
+    scaleBoard.innerText = `Бал НМТ/ЄВІ: ${scaledScore}`;
+    scaleBoard.style.display = 'inline-block';
+
+    document.getElementById('rawScoreSummary').innerText = `${rawScore} / 32`;
+    document.getElementById('scaledScoreSummary').innerText = scaledScore;
+    document.getElementById('tabSwitchSummary').innerText = tabSwitchCount;
+    document.getElementById('scoreSummaryCard').classList.add('active');
+
+    document.getElementById('submitBtn').style.display = 'none';
+
+    applySubmissionStyles();
+    document.getElementById('scoreSummaryCard').scrollIntoView({ behavior: 'smooth' });
+}
+
+function applySubmissionStyles() {
+    quizData.forEach(task => {
+        task.questions.forEach(q => {
+            const expBox = document.getElementById(`exp-${q.id}`);
+            if (expBox) expBox.classList.add('visible');
+
+            const qBlock = document.getElementById(`q-block-${q.id}`);
+            if (qBlock) {
+                const buttons = qBlock.querySelectorAll('.option-btn');
+                const userAns = userAnswers[q.id];
+
+                buttons.forEach(btn => {
+                    const opt = btn.getAttribute('data-opt');
+                    if (opt === q.answer) {
+                        btn.classList.add('correct');
+                    }
+                    if (userAns === opt && userAns !== q.answer) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+            }
+        });
+    });
+}
+
+function generatePDFTemplate() {
+    let rawScore = 0;
+    quizData.forEach(task => {
+        task.questions.forEach(q => {
+            if (userAnswers[q.id] === q.answer) rawScore++;
+        });
+    });
+
+    const scaledScore = conversionTable[rawScore] || 0;
+
+    let pdfHtml = `<div style="font-family: system-ui, sans-serif; color: #0f172a; background: #ffffff; font-size: 10px;">`;
+
+    quizData.forEach((task, index) => {
+        // Додаємо шапку на першу сторінку
+        let headerHtml = '';
+        if (index === 0) {
+            headerHtml = `
+                <div style="border-bottom: 2px solid #1c3d8d; padding-bottom: 6px; margin-bottom: 8px;">
+                    <h1 style="font-size: 13px; color: #1c3d8d; margin-bottom: 4px;">Звіт із Пробного НМТ з англійської мови</h1>
+                    <div style="display: flex; justify-content: space-between; font-size: 9px; gap: 4px; flex-wrap: wrap;">
+                        <div><strong>Учень:</strong> ${studentName || 'Анонім'}</div>
+                        <div><strong>Дата:</strong> ${new Date().toLocaleDateString('uk-UA')}</div>
+                        <div><strong>Тестовий бал:</strong> ${rawScore} / 32</div>
+                        <div><strong>Бал НМТ/ЄВІ:</strong> ${scaledScore}</div>
+                        <div><strong>Виходів із вкладки:</strong> ${tabSwitchCount}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Кожне завдання — це окрема віртуальна сторінка з розривом після неї
+        let pageBreak = (index < quizData.length - 1) ? 'page-break-after: always;' : '';
+
+        pdfHtml += `
+            <div style="padding: 10px; ${pageBreak}">
+                ${headerHtml}
+                <h3 style="color:#1c3d8d; font-size: 11px; margin-top: 4px; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 2px;">${task.title}</h3>
+        `;
+        
+        task.questions.forEach(q => {
+            const userAns = userAnswers[q.id] || "Не надано";
+            const isCorrect = userAns === q.answer;
+            const statusColor = isCorrect ? '#16a34a' : '#dc2626';
+            const statusText = isCorrect ? "ПРАВИЛЬНО" : "НЕПРАВИЛЬНО";
+            let cleanPrompt = q.prompt.replace(/^\d+\.\s*/, '');
+
+            pdfHtml += `
+                <div style="margin-bottom: 4px; padding: 4px 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 3px;">
+                    <div style="font-weight: bold; font-size: 9px; margin-bottom: 2px; color: #0f172a;">
+                        Запитання ${q.id} (${cleanPrompt}) — <span style="color: ${statusColor};">${statusText}</span>
+                    </div>
+                    <div style="font-size: 9px; margin: 1px 0;">
+                        <strong>Ваша відповідь:</strong> ${userAns} &nbsp;|&nbsp; <strong>Правильна відповідь:</strong> ${q.answer}
+                    </div>
+                    <div style="background: #fef08a; padding: 3px 5px; border-radius: 2px; margin-top: 2px; font-size: 8px; line-height: 1.2;">
+                        ${q.exp}
+                    </div>
+                </div>
+            `;
+        });
+
+        pdfHtml += `</div>`;
+    });
+
+    pdfHtml += `</div>`;
+
+    const reportElem = document.getElementById('pdfReport');
+    reportElem.innerHTML = pdfHtml;
 }
 
 function downloadPDF() {
-  const element = document.getElementById("pdfPrintArea");
-  
-  element.classList.add("pdf-export-mode");
+    generatePDFTemplate();
+    const element = document.getElementById('pdfReport');
+    element.style.display = 'block';
 
-  const formattedName = studentName ? studentName.replace(/\s+/g, '_') : 'Студент';
-  const fileName = `Аналіз_тесту_${formattedName}.pdf`;
+    const opt = {
+        margin:       5,
+        filename:     `NMT_Report_${(studentName || 'Student').replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-  const opt = {
-    margin:       [10, 10, 10, 10],
-    filename:     fileName,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { 
-      mode: ['css', 'legacy'], 
-      avoid: ['.review-item', '.level-feedback-box', '.results-header', '.stat-box'] 
-    }
-  };
-
-  html2pdf().set(opt).from(element).save().then(() => {
-    element.classList.remove("pdf-export-mode");
-  });
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = 'none';
+    });
+}
+function resetQuiz() {
+    if (!confirm("Скинути всі відповіді та перезапустити таймер?")) return;
+    for (let key in userAnswers) delete userAnswers[key];
+    for (let key in skippedStatus) delete skippedStatus[key];
+    
+    testSubmitted = false;
+    currentTaskIdx = 0;
+    timeRemaining = 60 * 60;
+    tabSwitchCount = 0;
+    
+    document.getElementById("tabSwitchDisplay").innerText = `Виходів із вкладки: 0`;
+    document.getElementById('scoreBoard').innerText = `Тестовий бал: - / 32`;
+    document.getElementById('scaleBoard').style.display = 'none';
+    document.getElementById('scoreSummaryCard').classList.remove('active');
+    document.getElementById('submitBtn').style.display = 'inline-block';
+    
+    clearInterval(timerInterval);
+    startTimer();
+    renderQuiz();
 }
 </script>
-
 </body>
 </html>
